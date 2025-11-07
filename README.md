@@ -98,9 +98,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## � Linpks
+## 🔗 Links
 
-- 🤖 **[Live Bot Demo](https://t.me/YourBotUsername)** - Try the bot yourself
+- 🤖 **[Live Bot Demo](https://t.me/GeminiOrbitBot)** - Try the bot yourself
 - 📚 **[Setup Guide](./docs/setup-guide.md)** - Detailed installation instructions
 - 🔧 **[API Reference](./docs/api-reference.md)** - Technical documentation
 - 🤝 **[Contributing](./CONTRIBUTING.md)** - How to contribute
