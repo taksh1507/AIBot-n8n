@@ -4,7 +4,6 @@ A Telegram AI Chatbot built with n8n workflow automation that integrates with Op
 
 ![Workflow Diagram](./assets/workflow-diagram.png)
 
-> **📸 Image Placeholder**: Replace `./assets/workflow-diagram.png` with an actual screenshot of your n8n workflow showing the 5 connected nodes: Telegram Trigger → Prep Message → Call OpenRouter → Parse OpenRouter Response → Telegram Send Message
 
 ## 🚀 Features
 
@@ -72,10 +71,20 @@ The workflow consists of 5 main nodes:
 
 ## 🤖 Usage
 
+### Try the Live Bot
+🔗 **[Try AIBot on Telegram](https://t.me/YourBotUsername)** *(Replace with your actual bot username)*
+
+### How to Use
 1. Start a conversation with your bot on Telegram
 2. Send `/start` to get a welcome message
 3. Ask any question or request assistance
 4. The bot will respond with AI-generated answers
+
+### Example Commands
+- `/start` - Get welcome message and bot introduction
+- `What is Python?` - Ask any technical question
+- `Write a simple function` - Request code examples
+- `Explain machine learning` - Get detailed explanations
 
 ## 📝 License
 
@@ -88,6 +97,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+## � Linpks
+
+- 🤖 **[Live Bot Demo](https://t.me/YourBotUsername)** - Try the bot yourself
+- 📚 **[Setup Guide](./docs/setup-guide.md)** - Detailed installation instructions
+- 🔧 **[API Reference](./docs/api-reference.md)** - Technical documentation
+- 🤝 **[Contributing](./CONTRIBUTING.md)** - How to contribute
 
 ## 📞 Support
 
