@@ -1,0 +1,203 @@
+{
+  "name": "Telegram × OpenRouter AI Chatbot",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "a5f80cb2-c49e-4ea3-9f7a-46ac6bdd97df",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        192
+      ],
+      "webhookId": "e762761d-8f78-4fc4-ab9c-950e685c70e0",
+      "credentials": {
+        "telegramApi": {
+          "id": "2jKbQtnRS6IThNTE",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract message text and chat ID from Telegram\nconst update = $json;\nconst chatId = update.message?.chat?.id;\nconst text = (update.message?.text || '').trim();\n\nif (/^\\/start/i.test(text)) {\n  return [{ chatId, userText: '/start', reply: 'Hi! I am Polaris Alpha — your AI assistant.' }];\n}\n\nreturn [{ chatId, userText: text }];\n"
+      },
+      "id": "bc7623ec-83c5-42df-aa5a-90e75312d528",
+      "name": "Prep Message",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        256,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "HTTP-Referer",
+              "value": "https://taksh1507.app.n8n.cloud"
+            },
+            {
+              "name": "X-Title",
+              "value": "Telegram Grok Bot"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"openrouter/polaris-alpha\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are Polaris Alpha — a quick, reliable, and polite Telegram assistant. Respond clearly and concisely, without markdown or emojis.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"{{$json.userText}}\"\n    }\n  ],\n  \"temperature\": 0.6,\n  \"max_tokens\": 512\n}\n",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "bf9651af-9d6a-4719-9a5f-49d8c71ebc3f",
+      "name": "Call OpenRouter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        512,
+        192
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "NhyvjZdhUgAGTkR7",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// === AIBot RESPONSE FORMATTING (FIXED) ===\n\n// 1️⃣ Extract message safely\nlet rawText = \"Sorry, I didn’t get a valid response from AIBot.\";\n\ntry {\n  const choices = $json.choices || [];\n  if (choices.length > 0) {\n    rawText = choices[0].message?.content?.trim() || rawText;\n  } else if ($json.text) {\n    rawText = $json.text;\n  }\n} catch (error) {\n  rawText = `Error: ${error.message}`;\n}\n\n// 2️⃣ Clean up unwanted whitespace\nrawText = rawText.replace(/\\s{3,}/g, '\\n\\n').trim();\n\n// 3️⃣ Detect code blocks or inline code\nfunction formatSections(text) {\n  // Convert triple backticks into Telegram-friendly monospace blocks\n  text = text.replace(/```([\\s\\S]*?)```/g, (_, code) => {\n    return '\\n```\\n' + code.trim() + '\\n```\\n';\n  });\n\n  // Inline code formatting (avoid breaking MarkdownV2)\n  text = text.replace(/`([^`]+)`/g, (_, code) => {\n    return '`' + code.replace(/([_*[\\]()~`>#+=|{}.!\\\\-])/g, '\\\\$1') + '`';\n  });\n\n  return text;\n}\n\n// 4️⃣ Escape MarkdownV2 characters safely\nfunction escapeMarkdown(text) {\n  // Dash placed at end to avoid “range out of order” bug\n  return text.replace(/([_*[\\]()~`>#+=|{}.!\\\\-])/g, '\\\\$1');\n}\n\n// 5️⃣ Apply formatting\nlet formatted = formatSections(rawText);\nformatted = escapeMarkdown(formatted);\n\n// 6️⃣ Add elegant AIBot header & structure\nlet message = \n`🤖 *AIBot — Intelligent Assistant*\\n` +\n`───────────────────────────────\\n\\n` +\n`*🧠 Query:*\\n_${escapeMarkdown($items('Prep Message')[0].json.userText)}_\\n\\n` +\n`*💬 Answer:*\\n${formatted}`;\n\n// 7️⃣ Trim overly long replies\nif (message.length > 4000) {\n  message = message.substring(0, 3990) + \"\\\\n_(truncated)_\";\n}\n\n// 8️⃣ Return formatted message for Telegram\nreturn [{\n  chatId: $items('Prep Message')[0].json.chatId,\n  text: message\n}];\n"
+      },
+      "id": "aa346419-3f9e-42d1-925b-d0b2f043a25f",
+      "name": "Parse OpenRouter Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        752,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chatId}}",
+        "text": "={{$json.text}}",
+        "additionalFields": {}
+      },
+      "id": "05bd2a14-052a-43a9-bf2a-903cee32f6da",
+      "name": "Telegram Send Message",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        992,
+        192
+      ],
+      "webhookId": "49d512a9-6f97-4e05-bae0-eb59a5cc3564",
+      "credentials": {
+        "telegramApi": {
+          "id": "2jKbQtnRS6IThNTE",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Telegram Trigger": [
+      {
+        "json": {
+          "update_id": 277351169,
+          "message": {
+            "message_id": 38,
+            "from": {
+              "id": 1926282123,
+              "is_bot": false,
+              "first_name": "Taksh",
+              "last_name": "Gandhi",
+              "username": "TakshGandhi1507",
+              "language_code": "en"
+            },
+            "chat": {
+              "id": 1926282123,
+              "first_name": "Taksh",
+              "last_name": "Gandhi",
+              "username": "TakshGandhi1507",
+              "type": "private"
+            },
+            "date": 1762533484,
+            "text": "Write the rsa algo python code in simpler version"
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Prep Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prep Message": {
+      "main": [
+        [
+          {
+            "node": "Call OpenRouter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call OpenRouter": {
+      "main": [
+        [
+          {
+            "node": "Parse OpenRouter Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse OpenRouter Response": {
+      "main": [
+        [
+          {
+            "node": "Telegram Send Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5f7862bf-5708-48db-9295-c628d8aae549",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e3be24a3124ab859e18a59ed465ce6ca939f07d496d72869d8ab27fd37238b0b"
+  },
+  "id": "NBdcLoc3nKUbH1Zm",
+  "tags": []
+}
