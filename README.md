@@ -72,7 +72,7 @@ The workflow consists of 5 main nodes:
 ## 🤖 Usage
 
 ### Try the Live Bot
-🔗 **[Try AIBot on Telegram](https://t.me/YourBotUsername)** *(Replace with your actual bot username)*
+🔗 **[Try AIBot on Telegram](https://t.me/GeminiOrbitBot)** *(Replace with your actual bot username)*
 
 ### How to Use
 1. Start a conversation with your bot on Telegram
