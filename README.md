@@ -1,5 +1,10 @@
 # AIBot n8n Workflow
 
+[![n8n](https://img.shields.io/badge/n8n-workflow-automation-E03A42?logo=n8n&logoColor=white)](src/AIBot_Workflow.json)
+[![Telegram](https://img.shields.io/badge/Telegram-bot-2CA5E0?logo=telegram&logoColor=white)](docs/setup-guide.md)
+[![OpenRouter](https://img.shields.io/badge/OpenRouter-Polaris%20Alpha-374151)](docs/api-reference.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A Telegram AI Chatbot built with n8n workflow automation that integrates with OpenRouter's Polaris Alpha model to provide intelligent responses.
 
 ![Workflow Diagram](./assets/workflow-diagram.png)
@@ -89,6 +94,21 @@ The workflow consists of 5 main nodes:
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## ✅ Verification Status
+
+Verified in this audit:
+
+| Check | Result |
+| --- | --- |
+| Workflow JSON (`src/AIBot_Workflow.json`) | PASS — valid JSON (utf-8-sig), 7,250 chars |
+| Node structure vs. README | PASS — exactly 5 nodes: Telegram Trigger, Prep Message, Call OpenRouter, Parse OpenRouter Response, Telegram Send Message |
+| Node connections | PASS — wired Trigger → Prep → OpenRouter → Parse → Send |
+| Hardcoded credentials scan | PASS — no OpenRouter keys, Telegram tokens, JWTs, or key=value secrets found |
+
+Notes:
+- No test suite or CI workflow exists in the repository; verification above is structural (JSON parse + node graph), not runtime (requires a running n8n instance).
+- Credentials (Telegram bot token, OpenRouter API key) must be configured in the n8n credentials UI — they are deliberately absent from the workflow file.
 
 ## 👨‍💻 Author
 
